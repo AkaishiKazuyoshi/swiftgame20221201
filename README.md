@@ -1,0 +1,2 @@
+# swiftgame20221201
+SpriteKitの理解のためのやつ
