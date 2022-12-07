@@ -19,13 +19,95 @@ class GameScene: SKScene {
     let playerAgent = GKAgent2D()
     let agentSystem = GKComponentSystem(componentClass: GKAgent2D.self)
     var enemyAgents = [GKAgent2D]()
+    var obstacles = [GKCircleObstacle]()
     
     override func didMove(to view: SKView) {
         player.fillColor = UIColor(red: 0.93, green: 0.96, blue: 0.00, alpha: 1.0)
+        player.physicsBody = SKPhysicsBody(circleOfRadius: 20)
         addChild(player)
+        
+        createObstacles()
         setCreateEnemyTimer()
         physicsWorld.gravity = CGVector()
     }
+    
+    func createObstacles() {
+        guard let viewFrame = view?.frame else {
+            return
+        }
+        
+        while obstacles.count < 5 {
+            let point = CGPoint(
+                x: CGFloat(arc4random_uniform(UInt32(viewFrame.width))) - viewFrame.width / 2,
+                y: CGFloat(arc4random_uniform(UInt32(viewFrame.height))) - viewFrame.height / 2)
+            let radius = Float(arc4random_uniform(50) + 50)
+            
+            // 障害物かPlayerが衝突していたら設置しない
+            let isObstacleOverlapped = obstacles.contains {
+                let dx = (Float(point.x) - $0.position.x)
+                let dy = (Float(point.y) - $0.position.y)
+                if sqrt(dx*dx + dy*dy) < $0.radius + radius {
+                    return true
+                }
+                return false
+            }
+            let dx = point.x - player.position.x
+            let dy = point.y - player.position.y
+            let isPlayerOverlapped = sqrt(dx*dx + dy*dy) < CGFloat(radius) + player.frame.width
+            if isObstacleOverlapped || isPlayerOverlapped {
+                continue
+            }
+            
+            let obstacleNode = SKShapeNode(circleOfRadius: CGFloat(radius))
+            obstacleNode.fillColor = UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1.0)
+            obstacleNode.position = point
+            obstacleNode.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(radius))
+            obstacleNode.physicsBody?.pinned = true
+            addChild(obstacleNode)
+            
+            let obstacle = GKCircleObstacle(radius: radius)
+            obstacle.position = float2(x: Float(point.x), y: Float(point.y))
+            obstacles.append(obstacle)
+        }
+    }
+    
+    //            guard let viewFrame = view?.frame else {
+    //                return
+    //            }
+    //
+    //            var obstacleNodes = [SKShapeNode]()
+    //            while obstacleNodes.count < 5 {
+    //                let point = CGPoint(
+    //                    x: CGFloat(arc4random_uniform(UInt32(viewFrame.width))) - viewFrame.width / 2,
+    //                    y: CGFloat(arc4random_uniform(UInt32(viewFrame.height))) - viewFrame.height / 2)
+    //                let radius = CGFloat(arc4random_uniform(50) + 50)
+    //
+    //                // 障害物かPlayerが衝突していたら設置しない
+    //                let isObstacleOverlapped = obstacleNodes.contains {
+    //                    let dx = (point.x - $0.position.x)
+    //                    let dy = (point.y - $0.position.y)
+    //                    if sqrt(dx*dx + dy*dy) < $0.frame.width + radius {
+    //                        return true
+    //                    }
+    //                    return false
+    //                }
+    //                let dx = point.x - player.position.x
+    //                let dy = point.y - player.position.y
+    //                let isPlayerOverlapped = sqrt(dx*dx + dy*dy) < radius + player.frame.width
+    //                if isObstacleOverlapped || isPlayerOverlapped {
+    //                    continue
+    //                }
+    //
+    //                let obstacleNode = SKShapeNode(circleOfRadius: CGFloat(radius))
+    //                obstacleNode.fillColor = UIColor(red: 0.7, green: 0.7, blue: 0.7, alpha: 1.0)
+    //                obstacleNode.position = point
+    //                obstacleNode.physicsBody = SKPhysicsBody(circleOfRadius: CGFloat(radius))
+    //                obstacleNode.physicsBody?.pinned = true
+    //                addChild(obstacleNode)
+    //                obstacleNodes.append(obstacleNode)
+    //            }
+    //        }
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         touches.forEach {
             let point = $0.location(in: self)
@@ -46,22 +128,43 @@ class GameScene: SKScene {
     }
     
     @objc func createEnemy() {
-        let enemy = SKShapeNode(circleOfRadius: 10)
-        enemy.position.x = size.width / 2
-        enemy.fillColor = UIColor(red: 0.94, green: 0.14, blue: 0.08, alpha: 1.0)
-        enemy.physicsBody = SKPhysicsBody(circleOfRadius: enemy.frame.width / 2)
-        addChild(enemy)
-        enemies.append(enemy)
-        let anemyAgent = GKAgent2D()
-        anemyAgent.maxAcceleration = 30
-        anemyAgent.maxSpeed = 70
-        anemyAgent.position = vector_float2(x: Float(enemy.position.x), y: Float(enemy.position.y))
-        anemyAgent.delegate = self
-        anemyAgent.behavior = GKBehavior(goals: [
-            GKGoal(toSeekAgent: playerAgent),
-        ])
-        agentSystem.addComponent(anemyAgent)
-        enemyAgents.append(anemyAgent)
+//        let enemy = SKShapeNode(circleOfRadius: 10)
+//        enemy.position.x = size.width / 2
+//        enemy.fillColor = UIColor(red: 0.94, green: 0.14, blue: 0.08, alpha: 1.0)
+//        enemy.physicsBody = SKPhysicsBody(circleOfRadius: enemy.frame.width / 2)
+//        addChild(enemy)
+//        enemies.append(enemy)
+//
+//        let anemyAgent = GKAgent2D()
+//        anemyAgent.maxAcceleration = 200 // 今回修正、加速度を上げることで障害物を避けやすくする
+//        anemyAgent.maxSpeed = 70
+//        anemyAgent.position = vector_float2(x: Float(enemy.position.x), y: Float(enemy.position.y))
+//        anemyAgent.delegate = self
+//        anemyAgent.behavior = GKBehavior(goals: [
+//            GKGoal(toSeekAgent: playerAgent),
+//            GKGoal(toAvoid: obstacles, maxPredictionTime: 10), // 今回追加
+//        ], andWeights: [NSNumber(value: 1), NSNumber(value: 50)]) // 今回修正
+//        agentSystem.addComponent(anemyAgent)
+//        enemyAgents.append(anemyAgent)
+        
+        
+                let enemy = SKShapeNode(circleOfRadius: 10)
+                enemy.position.x = size.width / 2
+                enemy.fillColor = UIColor(red: 0.94, green: 0.14, blue: 0.08, alpha: 1.0)
+                enemy.physicsBody = SKPhysicsBody(circleOfRadius: enemy.frame.width / 2)
+                addChild(enemy)
+                enemies.append(enemy)
+                let anemyAgent = GKAgent2D()
+                anemyAgent.maxAcceleration = 200
+                anemyAgent.maxSpeed = 100
+                anemyAgent.position = vector_float2(x: Float(enemy.position.x), y: Float(enemy.position.y))
+                anemyAgent.delegate = self
+                anemyAgent.behavior = GKBehavior(goals: [
+                    GKGoal(toSeekAgent: playerAgent),
+                ])
+                agentSystem.addComponent(anemyAgent)
+                enemyAgents.append(anemyAgent)
+        
     }
     
     override func update(_ currentTime: TimeInterval) {
