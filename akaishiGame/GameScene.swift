@@ -10,6 +10,7 @@ import GameplayKit
 
 class GameScene: SKScene {
     
+    let eriko = SKSpriteNode(imageNamed: "Angry_Erikosan")
     let player = SKShapeNode(circleOfRadius: 20)
     var enemies = [SKShapeNode]()
     var timer: Timer?
@@ -24,7 +25,11 @@ class GameScene: SKScene {
     override func didMove(to view: SKView) {
         player.fillColor = UIColor(red: 0.93, green: 0.96, blue: 0.00, alpha: 1.0)
         player.physicsBody = SKPhysicsBody(circleOfRadius: 20)
+        eriko.size = CGSize(width: size.width / 5, height: size.height / 10)
+        eriko.position.x = 250
+        eriko.position.y = 40
         addChild(player)
+        addChild(eriko)
         
         createObstacles()
         setCreateEnemyTimer()
@@ -67,7 +72,7 @@ class GameScene: SKScene {
             
             let obstacle = GKCircleObstacle(radius: radius)
 //            obstacle.position = float2(x: Float(point.x), y: Float(point.y))
-            obstacle.position = simd_float2(x: Float(point.x), y: Float(point.y))
+            obstacle.position = vector_float2(x: Float(point.x), y: Float(point.y))
             obstacles.append(obstacle)
         }
     }
@@ -208,6 +213,11 @@ class GameScene: SKScene {
                 }
             }
         }
+//        else {
+//
+//            let scene = GameScene(size: size)
+//            self.view?.presentScene(scene)
+//        }
         prevTime = currentTime
     }
     
