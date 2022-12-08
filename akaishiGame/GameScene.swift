@@ -66,7 +66,8 @@ class GameScene: SKScene {
             addChild(obstacleNode)
             
             let obstacle = GKCircleObstacle(radius: radius)
-            obstacle.position = float2(x: Float(point.x), y: Float(point.y))
+//            obstacle.position = float2(x: Float(point.x), y: Float(point.y))
+            obstacle.position = simd_float2(x: Float(point.x), y: Float(point.y))
             obstacles.append(obstacle)
         }
     }
@@ -128,42 +129,49 @@ class GameScene: SKScene {
     }
     
     @objc func createEnemy() {
-//        let enemy = SKShapeNode(circleOfRadius: 10)
-//        enemy.position.x = size.width / 2
-//        enemy.fillColor = UIColor(red: 0.94, green: 0.14, blue: 0.08, alpha: 1.0)
-//        enemy.physicsBody = SKPhysicsBody(circleOfRadius: enemy.frame.width / 2)
-//        addChild(enemy)
-//        enemies.append(enemy)
-//
-//        let anemyAgent = GKAgent2D()
-//        anemyAgent.maxAcceleration = 200 // 今回修正、加速度を上げることで障害物を避けやすくする
-//        anemyAgent.maxSpeed = 70
-//        anemyAgent.position = vector_float2(x: Float(enemy.position.x), y: Float(enemy.position.y))
-//        anemyAgent.delegate = self
+        let enemy = SKShapeNode(circleOfRadius: 10)
+        enemy.position.x = size.width / 2
+        enemy.fillColor = UIColor(red: 0.94, green: 0.14, blue: 0.08, alpha: 1.0)
+        enemy.physicsBody = SKPhysicsBody(circleOfRadius: enemy.frame.width / 2)
+        addChild(enemy)
+        enemies.append(enemy)
+        
+        let anemyAgent = GKAgent2D()
+        anemyAgent.maxAcceleration = 200
+        anemyAgent.maxSpeed = 80
+        anemyAgent.position = vector_float2(x: Float(enemy.position.x), y: Float(enemy.position.y))
+        anemyAgent.delegate = self
+        print(obstacles)
+        
 //        anemyAgent.behavior = GKBehavior(goals: [
 //            GKGoal(toSeekAgent: playerAgent),
-//            GKGoal(toAvoid: obstacles, maxPredictionTime: 10), // 今回追加
-//        ], andWeights: [NSNumber(value: 1), NSNumber(value: 50)]) // 今回修正
-//        agentSystem.addComponent(anemyAgent)
-//        enemyAgents.append(anemyAgent)
+//            GKGoal(toAvoid: obstacles, maxPredictionTime: 2),
+//        ], andWeights: [NSNumber(value: 1), NSNumber(value: 50)])
+        
+        anemyAgent.behavior = GKBehavior(goals: [
+            GKGoal(toSeekAgent: playerAgent),
+        ])
+        
+        agentSystem.addComponent(anemyAgent)
+        enemyAgents.append(anemyAgent)
         
         
-                let enemy = SKShapeNode(circleOfRadius: 10)
-                enemy.position.x = size.width / 2
-                enemy.fillColor = UIColor(red: 0.94, green: 0.14, blue: 0.08, alpha: 1.0)
-                enemy.physicsBody = SKPhysicsBody(circleOfRadius: enemy.frame.width / 2)
-                addChild(enemy)
-                enemies.append(enemy)
-                let anemyAgent = GKAgent2D()
-                anemyAgent.maxAcceleration = 200
-                anemyAgent.maxSpeed = 100
-                anemyAgent.position = vector_float2(x: Float(enemy.position.x), y: Float(enemy.position.y))
-                anemyAgent.delegate = self
-                anemyAgent.behavior = GKBehavior(goals: [
-                    GKGoal(toSeekAgent: playerAgent),
-                ])
-                agentSystem.addComponent(anemyAgent)
-                enemyAgents.append(anemyAgent)
+        //                let enemy = SKShapeNode(circleOfRadius: 10)
+        //                enemy.position.x = size.width / 2
+        //                enemy.fillColor = UIColor(red: 0.94, green: 0.14, blue: 0.08, alpha: 1.0)
+        //                enemy.physicsBody = SKPhysicsBody(circleOfRadius: enemy.frame.width / 2)
+        //                addChild(enemy)
+        //                enemies.append(enemy)
+        //                let anemyAgent = GKAgent2D()
+        //                anemyAgent.maxAcceleration = 200
+        //                anemyAgent.maxSpeed = 100
+        //                anemyAgent.position = vector_float2(x: Float(enemy.position.x), y: Float(enemy.position.y))
+        //                anemyAgent.delegate = self
+        //                anemyAgent.behavior = GKBehavior(goals: [
+        //                    GKGoal(toSeekAgent: playerAgent),
+        //                ])
+        //                agentSystem.addComponent(anemyAgent)
+        //                enemyAgents.append(anemyAgent)
         
     }
     
