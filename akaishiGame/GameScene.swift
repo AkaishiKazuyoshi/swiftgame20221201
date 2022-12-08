@@ -138,7 +138,7 @@ class GameScene: SKScene {
         
         let anemyAgent = GKAgent2D()
         anemyAgent.maxAcceleration = 200
-        anemyAgent.maxSpeed = 80
+        anemyAgent.maxSpeed = 200
         anemyAgent.position = vector_float2(x: Float(enemy.position.x), y: Float(enemy.position.y))
         anemyAgent.delegate = self
         print(obstacles)
