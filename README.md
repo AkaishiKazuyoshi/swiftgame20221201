@@ -1,2 +1,6 @@
-# swiftgame20221201
-SpriteKitの理解のためのやつ
+# swiftでゲームを作成してみた
+
+>gameを作るために使用したフレームワーク
+- [ ] SpriteKit
+- [ ] GamePlayKit
+
